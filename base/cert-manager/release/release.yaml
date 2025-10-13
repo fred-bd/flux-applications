@@ -1,0 +1,44 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cert-manager
+spec:
+  interval: 5m
+  targetNamespace: cert-manager
+  releaseName: cert-manager
+  chart:
+    spec:
+      chart: cert-manager
+      version: v1.18.1
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+      interval: 1m
+  values:
+    crds:
+      enabled: true
+    startupapicheck:
+      timeout: 10m
+    config:
+      apiVersion: controller.config.cert-manager.io/v1alpha1
+      kind: ControllerConfiguration
+      enableGatewayAPI: true
+    # affinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+    #       - matchExpressions:
+    #         - key: node.kubernetes.io/role
+    #           operator: In
+    #           values:
+    #           - worker
+    # tolerations:
+    #   - key: "tenant"
+    #     operator: "Equal"
+    #     value: "workload"
+    #     effect: "NoSchedule"      
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace

@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: local-helm-repo
+spec:
+  interval: 1m
+  insecure: true
+  url: ${helm_repo_address}
+  secretRef:
+    name: ${helm_repo_secret_name}

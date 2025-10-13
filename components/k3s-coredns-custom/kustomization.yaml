@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+namespace: kube-system
+
+# resources:
+#   - deployment.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: coredns-custom
+  literals:
+    - log.override=log
+  files:
+    - custom.server=configs/custom-server
+
+      

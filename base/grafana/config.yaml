@@ -1,0 +1,37 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: namespace
+spec:
+  path: ./base/grafana/ns
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: secrets
+spec:
+  path: ./base/grafana/secrets
+  dependsOn:
+    - name: kubeauth-job
+  postBuild:
+    substitute:
+      app_name: ${app_name}
+      app_namespace: ${app_namespace}
+      cluster_name: ${cluster_name}
+      secret_path: ${secret_path}
+      vault_address: ${vault_address}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: release
+spec:
+  path: ./base/grafana/release
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}
+      prometheus_route_prefix: ${prometheus_route_prefix}
+  dependsOn:
+    - name: kubeauth-job
+    - name: secrets

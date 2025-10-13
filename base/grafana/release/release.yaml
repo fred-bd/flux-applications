@@ -1,0 +1,82 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+spec:
+  interval: 5m
+  targetNamespace: grafana
+  releaseName: grafana
+  chart:
+    spec:
+      chart: grafana
+      version: 9.2.10
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+      interval: 1m
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+  values:
+    # Use an existing secret for the admin user.
+    admin:
+      ## Name of the secret. Can be templated.
+      existingSecret: grafana-credentials
+      userKey: admin_user
+      passwordKey: admin_password    
+    serviceMonitor:
+      enabled: false
+      namespace: grafana
+      labels:
+        release: prometheus
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Prometheus
+            type: prometheus
+            url: http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090${prometheus_route_prefix}
+            isDefault: true
+            editable: false
+            access: proxy
+    grafana.ini:
+      server:
+        root_url: "https://${domain}/grafana"
+        serve_from_sub_path: true
+      database:
+        type: postgres
+        host: "$__file{/etc/secrets/credentials/db_host}"
+        name: "$__file{/etc/secrets/credentials/db_name}"
+        user: "$__file{/etc/secrets/credentials/db_user}"
+        password: "$__file{/etc/secrets/credentials/db_password}"
+      security:
+        disable_initial_admin_creation: false
+        admin_user: "$__file{/etc/secrets/credentials/admin_user}"
+        admin_password: "$__file{/etc/secrets/credentials/admin_password}"
+        admin_email: "$__file{/etc/secrets/credentials/admin_email}"
+    extraSecretMounts:
+      - name: grafana-credentials-mount
+        secretName: grafana-credentials
+        defaultMode: 0440
+        mountPath: /etc/secrets/credentials
+        readOnly: true
+
+    persistence:
+      enabled: false
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      path: /grafana
+      pathType: Prefix
+      annotations:
+        cert-manager.io/cluster-issuer: ${cert_issuer_name}
+        nginx.ingress.kubernetes.io/service-upstream: "true"
+      hosts:
+        - ${domain}
+      tls:
+        - secretName: tls-cert
+          hosts:
+            - ${domain}
+

@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-auth-sa
+  namespace: ${app_namespace}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ${app_name}-tokenreview-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+  - kind: ServiceAccount
+    name: kube-auth-sa
+    namespace: ${app_namespace}
+---
+apiVersion: batch/v1
+kind: Job 
+metadata:
+  name: kube-auth-config-job
+  namespace: ${app_namespace}
+spec:
+  template:
+    spec:
+      ttlSecondsAfterFinished: 100
+      imagePullSecrets:
+      - name: artifactory-credentials
+      containers:
+      - name: vault-kubeauth-job
+        image: hashicorp/vault:1.14
+        imagePullPolicy: IfNotPresent
+        command: 
+        - /bin/sh
+        - "-c"
+        - |
+
+          handle_error() {
+              echo "Error: $1" >&2
+              exit 0
+          }
+
+          export VAULT_TOKEN=$(vault write -field=token auth/$VAULT_KUBEAUTH_ROLE/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID) || handle_error "Failed to obtain Vault token"
+          KUBEAUTH_NAME="kube/$CLUSTER_NAME"
+
+          # Check if kube auth method is enabled
+          if vault auth list | grep -q "$KUBEAUTH_NAME/"; then
+            echo "!!kube auth method enabled already at $KUBEAUTH_NAME!!"
+          else
+            vault auth enable --path="$KUBEAUTH_NAME" kubernetes
+          fi
+
+          #policies must be lower case
+          LOWER_PATH=$(echo "$SECRET_PATH" | tr '[:upper:]' '[:lower:]')
+          policy_name="$(echo $LOWER_PATH | sed 's,/,-,g')-readonly"
+
+          cat <<EOT | vault policy write $policy_name -
+          path "$LOWER_PATH/*" {
+            capabilities = [ "read", "list" ]
+          }
+          EOT
+
+          vault write auth/$KUBEAUTH_NAME/config \
+            kubernetes_host=$KUBERNETES_HOST \
+            disable_local_ca_jwt=true \
+            kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+          role_name="$APP_NAME-reader"
+
+          vault write auth/$KUBEAUTH_NAME/role/$role_name \
+            bound_service_account_names=$KUBE_AUTH_SA \
+            bound_service_account_namespaces=$APP_NAMESPACE \
+            policies=$policy_name \
+            ttl=1h
+        env:
+          - name: KUBE_AUTH_SA
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.serviceAccountName
+          - name: APP_NAME
+            value: ${app_name}
+          - name: APP_NAMESPACE
+            value: ${app_namespace}
+          - name: VAULT_SKIP_VERIFY
+            value: "true"
+          - name: VAULT_ADDR
+            value: ${vault_address}
+          - name: CLUSTER_NAME
+            value: ${cluster_name}
+          - name: SECRET_PATH
+            value: ${secret_path}
+          - name: VAULT_SECRET_ID
+            valueFrom:
+              secretKeyRef:
+                name: ${k8s_secret_name}
+                key: secret-id
+          - name: VAULT_ROLE_ID
+            valueFrom:
+              secretKeyRef:
+                name: ${k8s_secret_name}
+                key: approle-id
+          - name: VAULT_KUBEAUTH_ROLE
+            value: ${kubeauth_approle}
+          - name: KUBERNETES_HOST
+            value: ${k8s_host}
+      restartPolicy: Never
+      serviceAccountName: kube-auth-sa

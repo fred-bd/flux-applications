@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: kube-dns
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    kustomize.toolkit.fluxcd.io/ssa: merge
+  name: coredns
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-dns
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-dns
+    spec:
+      containers: []
+      volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: Corefile
+              path: Corefile
+            - key: NodeHosts
+              path: NodeHosts
+            name: coredns
+          name: config-volume
+        - configMap:
+            defaultMode: 420
+            name: coredns-custom
+            optional: true
+          name: flux-config-volume

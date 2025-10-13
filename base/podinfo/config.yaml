@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: release
+spec:
+  path: ./base/podinfo/release
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1
+# kind: Kustomization
+# metadata:
+#   name: hpa
+# spec:
+#   path: ./base/podinfo/hpa
+#   dependsOn:
+#     - name: release

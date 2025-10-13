@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: pool
+spec:
+  path: ./base/metallb/configs/pool
+  postBuild:
+    substitute:
+      ip_address_range: ${ip_address_range}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: advertised
+spec:
+  path: ./base/metallb/configs/advertise
+  dependsOn:
+    - name: pool

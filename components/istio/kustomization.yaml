@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - gateway.yaml
+  - all-in-one-vs.yaml
+  # - grafana-vs.yaml
+  # - kiali-vs.yaml
+  # - podinfo-vs.yaml
+  # - prometheus-vs.yaml

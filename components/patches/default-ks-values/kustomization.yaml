@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+  - target:
+      kind: Kustomization
+    patch: |
+      apiVersion: all
+      kind: all
+      metadata:
+        name: all
+      spec:
+        interval: 5m
+        retryInterval: 1m
+        prune: true
+        wait: true
+        timeout: 1m0s
+        sourceRef:
+          kind: GitRepository
+          name: flux-applications

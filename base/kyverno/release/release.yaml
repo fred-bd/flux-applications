@@ -1,0 +1,44 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kyverno
+spec:
+  interval: 10m
+  timeout: 5m
+  targetNamespace: kyverno
+  releaseName: kyverno
+  chart:
+    spec:
+      chart: kyverno
+      version: 3.x
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+      interval: 1m
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+
+  values:
+    backgroundController:
+      rbac:
+        clusterRole:
+          extraResources:
+            - apiGroups:
+                - helm.toolkit.fluxcd.io
+              resources:
+                - helmreleases
+              verbs:
+                - patch
+                - update
+                - view
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - namespaces
+              verbs:
+                - update

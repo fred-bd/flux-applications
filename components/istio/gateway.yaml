@@ -1,0 +1,32 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-cert-gateway
+  namespace: istio-ingress
+spec:
+  secretName: tls-cert
+  issuerRef:
+    name: ${cert_issuer_name}
+    kind: ClusterIssuer
+  dnsNames:
+    - ${domain}
+---
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: main-gateway
+  namespace: istio-ingress
+spec:
+  selector:
+    app: istio-gateway
+    istio: gateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: tls-cert
+    hosts:
+    - ${domain}

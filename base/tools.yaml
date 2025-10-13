@@ -1,0 +1,264 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-secrets
+spec:
+  path: ./base/external-secrets
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: metallb
+spec:
+  path: ./base/metallb
+  postBuild:
+    substitute:
+      ip_address_range: ${ip_address_range}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nginx
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/nginx
+  postBuild:
+    substitute:
+      nginx_namespace: ${nginx_namespace:=nginx-ingress}
+  dependsOn:
+    - name: metallb
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: istio
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/istio-ambient
+  postBuild:
+    substitute:
+      platform: ${istio_platform:=k3s}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: podinfo
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/podinfo
+  # dependsOn:
+    # - name: nginx
+    # - name: cert-manager
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: podinfo2
+  labels:
+    kustom.component: testing
+spec:
+  path: ./base/podinfo2
+  # dependsOn:
+    # - name: nginx
+    # - name: cert-manager
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: prometheus
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/prometheus
+  # dependsOn:
+    # - name: nginx
+    # - name: cert-manager
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}
+      route_prefix: ${prometheus_route_prefix:=/prometheus}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: netshoot
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/netshoot
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cert-manager
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/cert-manager
+  dependsOn:
+    - name: secret-replicator
+    - name: k8s-gateway
+  postBuild:
+    substitute:
+      app_name: cert-manager
+      app_namespace: cert-manager
+      vault_address: ${vault_address}
+      cluster_name: ${cluster_name}
+      secret_path: ${cert_issuer_vault_path}
+      k8s_secret_name: ${k8s_secret_name}
+      kubeauth_approle: ${kubeauth_approle}
+      k8s_host: ${k8s_host}
+      k8s_audiences: ${k8s_audiences}
+      cert_issuer_name: ${cert_issuer_name}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: secret-replicator
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/secret-replicator
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kiali
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/kiali
+  dependsOn:
+    - name: nginx
+    - name: cert-manager
+    # - name: istio
+    # - name: prometheus
+    # - name: grafana
+    - name: external-secrets
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}
+      prometheus_route_prefix: ${prometheus_route_prefix:=/prometheus}
+      app_name: kiali
+      app_namespace: kiali
+      cluster_name: ${cluster_name}
+      k8s_host: ${k8s_host}
+      k8s_secret_name: ${k8s_secret_name}
+      kubeauth_approle: ${kubeauth_approle}
+      secret_path: grafana
+      vault_address: ${vault_address}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: grafana
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/grafana
+  dependsOn:
+    # - name: nginx
+    # - name: cert-manager
+    - name: prometheus
+    - name: external-secrets
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}
+      prometheus_route_prefix: ${prometheus_route_prefix:=/prometheus}
+      app_name: grafana
+      app_namespace: grafana
+      cluster_name: ${cluster_name}
+      k8s_host: ${k8s_host}
+      k8s_secret_name: ${k8s_secret_name}
+      kubeauth_approle: ${kubeauth_approle}
+      secret_path: grafana
+      vault_address: ${vault_address}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: k8s-gateway
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/k8s-gateway-crds
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: flagger
+  # labels:
+  #   kustom.component: testing
+spec:
+  dependsOn:
+    - name: prometheus
+    - name: istio
+  path: ./base/flagger
+  postBuild:
+    substitute:
+      prometheus_route_prefix: ${prometheus_route_prefix:=/prometheus}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: flagger-load-tester
+  # labels:
+  #   kustom.component: testing
+spec:
+  dependsOn:
+    - name: flagger
+  path: ./base/flagger-loadtester
+  # postBuild:
+  #   substitute:
+  #     prometheus_route_prefix: ${prometheus_route_prefix:=/prometheus}
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1
+# kind: Kustomization
+# metadata:
+#   name: flagger-grafana
+#   # labels:
+#   #   kustom.component: testing
+# spec:
+#   dependsOn:
+#     - name: flagger
+#     - name: grafana
+#   path: ./base/flagger-grafana
+#   postBuild:
+#     substitute:
+#       prometheus_route_prefix: ${prometheus_route_prefix:=/prometheus}
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kyverno
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/kyverno
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kube-dash
+  # labels:
+  #   kustom.component: testing
+spec:
+  path: ./base/kubernetes-dashboard
+  postBuild:
+    substitute:
+      domain: ${domain}
+      cert_issuer_name: ${cert_issuer_name}

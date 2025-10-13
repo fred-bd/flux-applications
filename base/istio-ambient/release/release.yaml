@@ -1,0 +1,54 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: istio
+spec:
+  interval: 5m
+  targetNamespace: istio-system
+  chart:
+    spec:
+      chart: ambient
+      version: 1.26.2
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+      interval: 1m
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+  values:
+    global:
+      platform: ${platform}
+    istiod:
+      replicaCount: 2
+      pilot:
+        cni:
+          enabled: true
+        env:
+          PILOT_ENABLE_ALPHA_GATEWAY_API: "true"
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #       - matchExpressions:
+      #         - key: node.kubernetes.io/role
+      #           operator: In
+      #           values:
+      #           - worker
+      # tolerations:
+      #   - key: "tenant"
+      #     operator: "Equal"
+      #     value: "workload"
+      #     effect: "NoSchedule"
+    # cni:
+    #   affinity:
+    #     nodeAffinity:
+    #       requiredDuringSchedulingIgnoredDuringExecution:
+    #         nodeSelectorTerms:
+    #         - matchExpressions:
+    #           - key: node.kubernetes.io/role
+    #             operator: In
+    #             values:
+    #             - worker

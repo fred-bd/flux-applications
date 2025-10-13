@@ -1,0 +1,17 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: kubeauth-job
+spec:
+  path: ./components/kube-auth-job/job
+  force: true
+  postBuild:
+    substitute:
+      app_name: ${app_name}
+      app_namespace: ${app_namespace}
+      cluster_name: ${cluster_name}
+      secret_path: ${secret_path}
+      vault_address: ${vault_address}
+      kubeauth_approle: ${kubeauth_approle}
+      k8s_secret_name: ${k8s_secret_name}
+      k8s_host: ${k8s_host}

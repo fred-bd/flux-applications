@@ -1,0 +1,15 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: namespace
+spec:
+  path: ./base/cilium/ns
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: release
+spec:
+  path: ./base/cilium/release
+  dependsOn:
+    - name: namespace

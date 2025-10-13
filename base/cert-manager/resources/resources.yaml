@@ -1,0 +1,31 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-ca-issuer
+  namespace: cert-manager
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts/token
+  verbs:
+  - 'create'
+  resourceNames: 
+  - kube-auth-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-ca-issuer
+  namespace: cert-manager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vault-ca-issuer
+subjects:
+- kind: ServiceAccount
+  name: cert-manager
+  namespace: cert-manager
+- kind: ServiceAccount
+  name: kube-auth-sa
+  namespace: cert-manager

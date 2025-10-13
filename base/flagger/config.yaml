@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ns
+spec:
+  path: ./base/flagger/ns
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: release
+spec:
+  dependsOn:
+    - name: ns
+  path: ./base/flagger/release
+  targetNamespace: flux-system
+  postBuild:
+    substitute:
+      prometheus_route_prefix: ${prometheus_route_prefix}

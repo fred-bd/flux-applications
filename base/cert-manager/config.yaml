@@ -1,0 +1,34 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: release
+spec:
+  path: ./base/cert-manager/release
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: resources
+spec:
+  path: ./base/cert-manager/resources
+  dependsOn:
+    - name: release
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: issuers
+spec:
+  path: ./base/cert-manager/issuers
+  dependsOn:
+    - name: release
+    - name: resources
+    - name: kubeauth-job
+  postBuild:
+    substitute:
+      app_name: ${app_name}
+      vault_address: ${vault_address}
+      cluster_name: ${cluster_name}
+      secret_path: ${secret_path}
+      k8s_audiences: ${k8s_audiences}
+      cert_issuer_name: ${cert_issuer_name}

@@ -1,0 +1,37 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: external-secrets
+spec:
+  interval: 5m
+  targetNamespace: external-secrets
+  releaseName: external-secrets
+  chart:
+    spec:
+      chart: external-secrets
+      version: 0.18.0
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+      interval: 1m
+  # values:
+  #   affinity:
+  #     nodeAffinity:
+  #       requiredDuringSchedulingIgnoredDuringExecution:
+  #         nodeSelectorTerms:
+  #         - matchExpressions:
+  #           - key: node.kubernetes.io/role
+  #             operator: In
+  #             values:
+  #             - worker
+  #   tolerations:
+  #     - key: "tenant"
+  #       operator: "Equal"
+  #       value: "workload"
+  #       effect: "NoSchedule"
+
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace

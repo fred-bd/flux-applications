@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: release
+spec:
+  path: ./base/metallb/release
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: configurations
+spec:
+  path: ./base/metallb/configs
+  dependsOn:
+    - name: release
+  postBuild:
+    substitute:
+      ip_address_range: ${ip_address_range}

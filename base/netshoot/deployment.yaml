@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: netshoot
+  name: netshoot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: netshoot
+  template:
+    metadata:
+      labels:
+        run: netshoot
+    spec:
+      containers:
+      - args:
+        - -c
+        - while true; do echo hello; sleep 10;done
+        command:
+        - /bin/sh
+        image: nicolaka/netshoot:latest
+        name: netshoot
+      # affinity:
+      #   nodeAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       nodeSelectorTerms:
+      #       - matchExpressions:
+      #         - key: node.kubernetes.io/role
+      #           operator: In
+      #           values:
+      #           - worker
+      # tolerations:
+      #   - key: "tenant"
+      #     operator: "Equal"
+      #     value: "workload"
+      #     effect: "NoSchedule"
+      

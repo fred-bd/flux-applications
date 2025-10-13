@@ -1,0 +1,41 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: istio-gateway
+spec:
+  interval: 5m
+  targetNamespace: istio-ingress
+  releaseName: istio-gateway
+  chart:
+    spec:
+      chart: gateway
+      version: 1.26.2
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+      interval: 1m
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+  values:
+    global:
+      platform: ${platform}
+      profile: ambient
+    labels:
+      "istio.io/dataplane-mode": ambient
+    # affinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+    #       - matchExpressions:
+    #         - key: node.kubernetes.io/role
+    #           operator: In
+    #           values:
+    #           - worker
+    # tolerations:
+    #   - key: "tenant"
+    #     operator: "Equal"
+    #     value: "workload"
+    #     effect: "NoSchedule"

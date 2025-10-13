@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: flagger-grafana
+spec:
+  interval: 5m
+  targetNamespace: istio-system
+  releaseName: flagger-grafana
+  chart:
+    spec:
+      chart: grafana
+      version: 1.7.0
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+      interval: 1m
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+  values:
+    url: http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090${prometheus_route_prefix}
+    # user: fred
+    # password: fran22
+

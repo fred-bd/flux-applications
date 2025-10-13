@@ -1,0 +1,63 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: podinfo
+spec:
+  interval: 5m
+  targetNamespace: podinfo
+  releaseName: podinfo
+  chart:
+    spec:
+      chart: podinfo
+      version: 6.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: local-helm-repo
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+  values:
+    # podAnnotations:
+    #   prometheus.io/scrape: "true"
+    #   prometheus.io/port: "9797"
+    #   app: podinfo
+    # #   version: 6.0.0
+    # service:
+    #   annotations:
+    #     app: podinfo
+    # #     version: 6.0.0
+    replicaCount: 2
+    # serviceMonitor:
+    #   enabled: true
+    #   interval: 15s
+    #   additionalLabels: 
+    #     release: prometheus
+    hpa:
+      enabled: false
+      minReplicas: 2
+      maxReplicas: 10
+      requests: 100
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+        cert-manager.io/cluster-issuer: ${cert_issuer_name}
+        nginx.ingress.kubernetes.io/service-upstream: "true"
+      hosts:
+        - host: ${domain}
+          paths:
+            - path: "/podinfo(/|$)(.*)"
+              pathType: ImplementationSpecific
+      tls:
+        - secretName: tls-cert
+          hosts:
+            - ${domain}

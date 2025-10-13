@@ -1,0 +1,25 @@
+nameReference:
+  - kind: Kustomization
+    fieldSpecs:
+      - kind: Kustomization
+        path: spec/dependsOn/name
+        
+  - kind: GitRepository
+    fieldSpecs:
+      - kind: Kustomization
+        path: spec/sourceRef/name
+
+  - kind: ServiceAccount
+    fieldSpecs:
+      - kind: ClusterRoleBinding
+        path: subjects/name
+      - kind: Job
+        path: spec/template/spec/serviceAccountName
+
+namePrefix:
+- path: metadata/name
+  kind: Kustomization
+- path: metadata/name
+  kind: GitRepository
+- path: metadata/name
+  kind: ServiceAccount

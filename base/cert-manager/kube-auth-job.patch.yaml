@@ -1,0 +1,65 @@
+- op: add
+  path: /spec/dependsOn
+  value:
+    - name: cert-manager-release
+    - name: cert-manager-resources
+- op: add
+  path: /spec/patches
+  value:
+    - target:
+        kind: Job
+      patch: |
+        - op: replace
+          path: /spec/template/spec/containers/0/command
+          value:
+            - /bin/sh
+            - "-c"
+            - |
+
+              handle_error() {
+                  echo "Error: $1" >&2
+                  exit 0
+              }
+
+              export VAULT_TOKEN=$(vault write -field=token auth/$VAULT_KUBEAUTH_ROLE/login role_id=$VAULT_ROLE_ID secret_id=$VAULT_SECRET_ID) || handle_error "Failed to obtain Vault token"
+              KUBEAUTH_NAME="kube/$CLUSTER_NAME"
+
+              # Check if kube auth method is enabled
+              if vault auth list | grep -q "$KUBEAUTH_NAME/"; then
+                echo "!!kube auth method enabled already at $KUBEAUTH_NAME!!"
+              else
+                vault auth enable --path="$KUBEAUTH_NAME" kubernetes
+              fi
+
+              #policies must be lower case
+              LOWER_PATH=$(echo "$SECRET_PATH" | tr '[:upper:]' '[:lower:]')
+              policy_name="$(echo $LOWER_PATH | sed 's,/,-,g')-readonly"
+
+              #### This piece of code is different from the original one
+              # --------------------------------------------------------
+              # Scaping way to use in patches
+              engine="$$$${LOWER_PATH%%/*}" 
+              sub_path="$$$${LOWER_PATH##*/}"
+
+              echo "engine: $engine"
+              echo "sub_path: $sub_path"
+
+              cat <<EOT | vault policy write $policy_name -
+              path "$engine/*" { capabilities = ["read", "list"] }
+              path "$engine/sign/$sub_path" { capabilities = ["create", "update"] }
+              path "$engine/issue/$sub_path" { capabilities = ["create"] }
+              EOT
+              # --------------------------------------------------------
+
+              vault write auth/$KUBEAUTH_NAME/config \
+                kubernetes_host=$KUBERNETES_HOST \
+                disable_local_ca_jwt=true \
+                kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+              role_name="$APP_NAME-reader"
+
+              vault write auth/$KUBEAUTH_NAME/role/$role_name \
+                bound_service_account_names=kube-auth-sa \
+                bound_service_account_namespaces=$APP_NAMESPACE \
+                policies=$policy_name \
+                ttl=1h
