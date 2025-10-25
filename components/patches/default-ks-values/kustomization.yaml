@@ -10,7 +10,7 @@ patches:
       metadata:
         name: all
       spec:
-        interval: 5m
+        interval: 10m
         retryInterval: 1m
         prune: true
         wait: true
