@@ -34,8 +34,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: istio
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/istio-ambient
   postBuild:
@@ -46,13 +46,13 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: podinfo
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/podinfo
-  # dependsOn:
-    # - name: nginx
-    # - name: cert-manager
+  dependsOn:
+    - name: nginx
+    - name: cert-manager
   postBuild:
     substitute:
       domain: ${domain}
@@ -78,8 +78,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: prometheus
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/prometheus
   dependsOn:
@@ -104,8 +104,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: cert-manager
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/cert-manager
   dependsOn:
@@ -137,8 +137,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: kiali
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/kiali
   dependsOn:
@@ -166,8 +166,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: grafana
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/grafana
   dependsOn:
@@ -255,8 +255,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: kube-dash
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/kubernetes-dashboard
   postBuild:
