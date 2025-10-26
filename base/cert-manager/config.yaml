@@ -1,9 +1,19 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: ns
+spec:
+  path: ./base/cert-manager/ns
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: release
 spec:
   path: ./base/cert-manager/release
+  dependsOn:
+    - name: resources
+    - name: kubeauth-job
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -12,7 +22,7 @@ metadata:
 spec:
   path: ./base/cert-manager/resources
   dependsOn:
-    - name: release
+    - name: ns
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -22,7 +32,7 @@ spec:
   path: ./base/cert-manager/issuers
   dependsOn:
     - name: release
-    - name: resources
+    # - name: resources
     - name: kubeauth-job
   postBuild:
     substitute:
