@@ -19,8 +19,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: nginx
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/nginx
   postBuild:
@@ -34,8 +34,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: istio
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/istio-ambient
   postBuild:
@@ -78,13 +78,13 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: prometheus
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/prometheus
-  # dependsOn:
-    # - name: nginx
-    # - name: cert-manager
+  dependsOn:
+    - name: nginx
+    - name: cert-manager
   postBuild:
     substitute:
       domain: ${domain}
@@ -137,8 +137,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: kiali
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/kiali
   dependsOn:
@@ -166,13 +166,13 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: grafana
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/grafana
   dependsOn:
-    # - name: nginx
-    # - name: cert-manager
+    - name: nginx
+    - name: cert-manager
     - name: prometheus
     - name: external-secrets
   postBuild:
