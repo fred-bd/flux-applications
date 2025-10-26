@@ -17,3 +17,16 @@ patches:
     target:
       kind: Kustomization
       name: kubeauth-job
+  - target:
+      kind: Kustomization
+      name: kubeauth-job
+    patch: |
+      apiVersion: v1
+      kind: all
+      metadata:
+        name: all
+      spec:
+        postBuild:
+          substitute:
+            k8s_audiences: ${k8s_audiences}
+

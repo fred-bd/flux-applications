@@ -10,6 +10,13 @@
         kind: Job
       patch: |
         - op: replace
+          path: /spec/template/spec/containers/0/env/0/
+          value:
+          - name: K8S_AUDIENCES
+            value: ${k8s_audiences}
+
+
+        - op: replace
           path: /spec/template/spec/containers/0/command
           value:
             - /bin/sh
@@ -62,4 +69,5 @@
                 bound_service_account_names=kube-auth-sa \
                 bound_service_account_namespaces=$APP_NAMESPACE \
                 policies=$policy_name \
+                audience=$K8S_AUDIENCES \
                 ttl=1h
