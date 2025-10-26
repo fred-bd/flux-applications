@@ -12,8 +12,8 @@
         - op: add
           path: /spec/template/spec/containers/0/env/-
           value:
-            - name: K8S_AUDIENCES
-              value: ${k8s_audiences}
+            name: K8S_AUDIENCES
+            value: ${k8s_audiences}
 
 
         - op: replace
