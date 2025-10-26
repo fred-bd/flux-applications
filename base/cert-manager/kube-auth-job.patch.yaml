@@ -9,7 +9,7 @@
     - target:
         kind: Job
       patch: |
-        - op: replace
+        - op: add
           path: /spec/template/spec/containers/0/env/-
           value:
           - name: K8S_AUDIENCES
