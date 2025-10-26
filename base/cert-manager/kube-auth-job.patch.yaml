@@ -10,7 +10,7 @@
         kind: Job
       patch: |
         - op: replace
-          path: /spec/template/spec/containers/0/env/-/
+          path: /spec/template/spec/containers/0/env/-
           value:
           - name: K8S_AUDIENCES
             value: ${k8s_audiences}
