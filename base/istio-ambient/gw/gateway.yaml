@@ -20,9 +20,8 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    global:
-      platform: ${platform}
-      profile: ambient
+    platform: ${platform}
+    profile: ambient
     labels:
       "istio.io/dataplane-mode": ambient
     # affinity:
