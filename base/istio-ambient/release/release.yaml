@@ -19,6 +19,7 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+
     global:
       platform: ${platform}
     istiod:
@@ -28,6 +29,14 @@ spec:
           enabled: true
         env:
           PILOT_ENABLE_ALPHA_GATEWAY_API: "true"
+    cni:
+      global:
+        platform: ${platform}
+    ztunnel:
+      global:
+        platform: ${platform}
+
+
       # affinity:
       #   nodeAffinity:
       #     requiredDuringSchedulingIgnoredDuringExecution:
