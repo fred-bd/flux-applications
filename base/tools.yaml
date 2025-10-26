@@ -19,8 +19,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: nginx
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/nginx
   postBuild:
@@ -28,6 +28,7 @@ spec:
       nginx_namespace: ${nginx_namespace:=nginx-ingress}
   dependsOn:
     - name: metallb
+    - name: prometheus
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
