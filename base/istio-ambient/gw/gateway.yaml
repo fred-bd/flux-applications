@@ -19,13 +19,13 @@ spec:
     createNamespace: true
   upgrade:
     crds: CreateReplace
-  values:
-    defaults:
-      global:
-        platform: ${platform}
-        profile: ambient
-      labels:
-        "istio.io/dataplane-mode": ambient
+  # values:
+  #   defaults:
+  #     global:
+  #       platform: ${platform}
+  #       profile: ambient
+  #     labels:
+  #       "istio.io/dataplane-mode": ambient
     # affinity:
     #   nodeAffinity:
     #     requiredDuringSchedulingIgnoredDuringExecution:
