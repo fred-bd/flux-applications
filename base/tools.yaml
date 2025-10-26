@@ -33,8 +33,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: istio
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/istio-ambient
   postBuild:
@@ -77,8 +77,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: prometheus
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/prometheus
   # dependsOn:
@@ -103,8 +103,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: cert-manager
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/cert-manager
   dependsOn:
@@ -136,8 +136,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: kiali
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/kiali
   dependsOn:
@@ -165,8 +165,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: grafana
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/grafana
   dependsOn:
@@ -201,8 +201,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: flagger
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   dependsOn:
     - name: prometheus
@@ -216,8 +216,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: flagger-load-tester
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   dependsOn:
     - name: flagger
@@ -245,8 +245,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: kyverno
-  # labels:
-  #   kustom.component: testing
+  labels:
+    kustom.component: testing
 spec:
   path: ./base/kyverno
 ---
