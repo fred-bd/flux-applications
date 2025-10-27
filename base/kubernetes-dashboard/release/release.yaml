@@ -55,7 +55,9 @@ spec:
         - kind: ServiceAccount
           name: admin-user
           namespace: kube-dashboard
-    auth:
-      containers:
-        args:
-          - "--enable-skip-login"
+    kong:
+      enabled: false
+    # auth:
+    #   containers:
+    #     args:
+    #       - "--enable-skip-login"
