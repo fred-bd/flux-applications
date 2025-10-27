@@ -55,8 +55,8 @@ spec:
         - kind: ServiceAccount
           name: admin-user
           namespace: kube-dashboard
-    kong:
-      enabled: false
+    # kong:
+    #   enabled: false
     # auth:
     #   containers:
     #     args:
