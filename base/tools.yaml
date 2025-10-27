@@ -46,8 +46,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: podinfo
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/podinfo
   dependsOn:
@@ -78,8 +78,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: prometheus
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/prometheus
   dependsOn:
@@ -137,8 +137,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: kiali
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/kiali
   dependsOn:
@@ -166,8 +166,8 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: grafana
-  labels:
-    kustom.component: testing
+  # labels:
+  #   kustom.component: testing
 spec:
   path: ./base/grafana
   dependsOn:
