@@ -72,25 +72,18 @@ Before you begin, ensure you have:
 - cilium
 - external-secrets
 - flagger
-- flagger-grafana
-- flagger-loadtester
 - grafana
 - istio
-- istio-ambient
 - k8s-gateway-crds
 - kiali
 - kubernetes-dashboard
-- kustomization.yaml
 - kyverno
 - metallb
 - netshoot
 - nginx
 - podinfo
-- podinfo2
 - prometheus
-- repository.yaml
 - secret-replicator
-- tools.yaml
 
 ### Generate a token to use on kube-dashboard
 
