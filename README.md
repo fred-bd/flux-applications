@@ -91,3 +91,9 @@ Before you begin, ensure you have:
 - repository.yaml
 - secret-replicator
 - tools.yaml
+
+### Generate a token to use on kube-dashboard
+
+```sh
+kubectl -n kube-dashboard create token admin-user --duration=999999h
+```
