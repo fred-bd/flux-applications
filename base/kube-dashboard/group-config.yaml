@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  path: ./kube-dashboard/dashboard
+  path: ./base/kube-dashboard/dashboard
   prune: true
   wait: true
   timeout: 2m0s
@@ -21,7 +21,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  path: ./kube-dashboard/ingress
+  path: ./base/kube-dashboard/ingress
   prune: true
   wait: true
   timeout: 2m0s
