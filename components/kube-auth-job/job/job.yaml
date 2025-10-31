@@ -26,8 +26,8 @@ spec:
   ttlSecondsAfterFinished: 100
   template:
     spec:
-      imagePullSecrets:
-      - name: artifactory-credentials
+      # imagePullSecrets:
+      # - name: artifactory-credentials
       containers:
       - name: vault-kubeauth-job
         image: hashicorp/vault:1.14
