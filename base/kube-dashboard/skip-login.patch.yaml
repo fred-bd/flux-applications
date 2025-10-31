@@ -1,0 +1,19 @@
+- op: add
+  path: /spec/patches
+  value:
+    - target:
+        kind: Deployment
+        name: kubernetes-dashboard
+      patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/args/-
+          value: --enable-skip-login
+    - target:
+        kind: Ingress
+      patch: |
+        - op: replace
+          path: /spec/tls/0/hosts/0
+          value: ${dns_name}
+        - op: replace
+          path: /spec/rules/0/host
+          value: ${dns_name}
