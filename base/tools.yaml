@@ -273,7 +273,7 @@ metadata:
   # labels:
   #   kustom.component: testing
 spec:
-  path: ./base/kubernetes-dashboard
+  path: ./base/kube-dashboard
   dependsOn:
     - name: nginx
   postBuild:
